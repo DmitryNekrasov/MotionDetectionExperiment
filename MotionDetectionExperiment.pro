@@ -28,4 +28,12 @@ LIBS += -L/opt/local/lib \
         -lopencv_imgproc \
         -lopencv_nonfree
 
+LIBS += -lopencv_ml
+LIBS += -lopencv_features2d
+LIBS += -lopencv_calib3d
+LIBS += -lopencv_objdetect
+LIBS += -lopencv_contrib
+LIBS += -lopencv_legacy
+LIBS += -lopencv_flann
+
 INCLUDEPATH += /opt/local/include
