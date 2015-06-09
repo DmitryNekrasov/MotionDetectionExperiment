@@ -20,3 +20,12 @@ HEADERS  += mainwindow.h \
     core.h
 
 FORMS    += mainwindow.ui
+
+LIBS += -L/opt/local/lib \
+        -lopencv_highgui \
+        -lopencv_core \
+        -lopencv_video \
+        -lopencv_imgproc \
+        -lopencv_nonfree
+
+INCLUDEPATH += /opt/local/include
