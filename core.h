@@ -5,6 +5,9 @@
 class Core
 {
 public:
+
+    void start();
+
     Core();
     ~Core();
 };
