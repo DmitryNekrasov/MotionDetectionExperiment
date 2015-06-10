@@ -1,10 +1,36 @@
 #include "core.h"
 #include <QDebug>
-#include <opencv2/core/core.hpp>
-#include <opencv2/highgui/highgui.hpp>
-#include <opencv2/video/tracking.hpp>
-#include <opencv2/imgproc/imgproc_c.h>
-#include <opencv2/opencv.hpp>
+
+cv::Rect objectBoundingRectangle = cv::Rect(0,0,0,0);
+
+void Core::searchForMovement(cv::Mat thresholdImage, cv::Mat &cameraFeed) {
+    bool objectDetected = false;
+    cv::Mat temp;
+    thresholdImage.copyTo(temp);
+
+    vector< vector<cv::Point> > contours;
+    vector<cv::Vec4i> hierarchy;
+
+    cv::findContours(temp, contours, hierarchy, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
+
+    if (contours.size() > 0) {
+        objectDetected = true;
+    } else {
+        objectDetected = false;
+    }
+
+    if (objectDetected) {
+        vector< vector<cv::Point> > largestContourVec;
+        largestContourVec.push_back(contours.at(contours.size()-1));
+
+//        qDebug() << largestContourVec.size();
+
+        objectBoundingRectangle = cv::boundingRect(largestContourVec.at(0));
+        int x = objectBoundingRectangle.x + objectBoundingRectangle.width / 2;
+        int y = objectBoundingRectangle.y + objectBoundingRectangle.height / 2;
+        cv::circle(cameraFeed, cv::Point(x,y), 20, cv::Scalar(0,255,0), 3);
+    }
+}
 
 void Core::start() {
 
@@ -21,14 +47,16 @@ void Core::start() {
     cv::namedWindow("Motion", 0);
     cv::Mat frame1;
     video >> frame1;
-    cv::imshow("Motion", frame1);
+//    cv::imshow("Motion", frame1);
 
     cv::Mat frame2, output;
 
     while (true) {
         video >> frame1;
+        cv::Mat colorFrame;
+        frame1.copyTo(colorFrame);
         cv::cvtColor(frame1, frame1, CV_BGR2GRAY);
-        cv::imshow("Motion", frame1);
+//        cv::imshow("Motion", frame1);
 
         video >> frame2;
         cv::cvtColor(frame2, frame2, CV_BGR2GRAY);
@@ -41,6 +69,10 @@ void Core::start() {
         cv::blur(output, output, cv::Size(10, 10));
         cv::threshold(output, output, 20, 255, cv::THRESH_BINARY);
         cv::imshow("final threshold", output);
+
+
+        searchForMovement(output, colorFrame);
+        cv::imshow("Motion", colorFrame);
 
 
 
