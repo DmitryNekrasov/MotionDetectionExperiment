@@ -23,21 +23,9 @@ void Core::start() {
     video >> frame;
     cv::imshow("Motion", frame);
 
-    cv::Ptr<cv::Retina> retina;
-    retina = new cv::Retina(frame.size());
-
-    cv::Mat retinaOutput_parvo;
-    cv::Mat retinaOutput_magno;
-
     while (true) {
         video >> frame;
         cv::imshow("Motion", frame);
-
-        retina->run(frame);
-        retina->getParvo(retinaOutput_parvo);
-        retina->getMagno(retinaOutput_magno);
-        cv::imshow("Parvo", retinaOutput_parvo);
-        cv::imshow("Magno", retinaOutput_magno);
 
         // выходим из цикла, если нажата какая-нибудь клавиша
         int keyCode = cv::waitKey(10);
@@ -51,6 +39,8 @@ void Core::start() {
     cv::destroyWindow("Motion");
     cv::destroyWindow("Parvo");
     cv::destroyWindow("Magno");
+    cv::destroyWindow("Magno High Binary Threshold");
+    cv::destroyWindow("Magno Low Binary Threshold");
 }
 
 Core::Core()
