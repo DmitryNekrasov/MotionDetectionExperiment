@@ -2,6 +2,7 @@
 #include <QDebug>
 
 cv::Rect objectBoundingRectangle = cv::Rect(0,0,0,0);
+vector<cv::Point> points;
 
 void Core::searchForMovement(cv::Mat thresholdImage, cv::Mat &cameraFeed) {
     bool objectDetected = false;
@@ -17,6 +18,7 @@ void Core::searchForMovement(cv::Mat thresholdImage, cv::Mat &cameraFeed) {
         objectDetected = true;
     } else {
         objectDetected = false;
+        points.clear();
     }
 
     if (objectDetected) {
@@ -28,15 +30,20 @@ void Core::searchForMovement(cv::Mat thresholdImage, cv::Mat &cameraFeed) {
         objectBoundingRectangle = cv::boundingRect(largestContourVec.at(0));
         int x = objectBoundingRectangle.x + objectBoundingRectangle.width / 2;
         int y = objectBoundingRectangle.y + objectBoundingRectangle.height / 2;
-        cv::circle(cameraFeed, cv::Point(x,y), 20, cv::Scalar(0,255,0), 3);
+        cv::circle(cameraFeed, cv::Point(x,y), 20, cv::Scalar(0, 255, 0), 3);
+        points.push_back(cv::Point(x, y));
+
+        for (int i = 0; i < points.size() - 1; i++) {
+            cv::line(cameraFeed, points.at(i), points.at(i + 1), cv::Scalar(0, 0, 255), 3);
+        }
     }
 }
 
 void Core::start() {
 
     // размер окна
-    int windowWidth = 540;
-    int windowHeight = 360;
+    int windowWidth = 1280;
+    int windowHeight = 720;
 
     // создание объекта видеозахвата и открытие (с камеры)
     cv::VideoCapture video = cv::VideoCapture();
@@ -61,14 +68,14 @@ void Core::start() {
         video >> frame2;
         cv::cvtColor(frame2, frame2, CV_BGR2GRAY);
         cv::absdiff(frame1, frame2, output);
-        cv::imshow("absdiff", output);
+//        cv::imshow("absdiff", output);
 
         cv::threshold(output, output, 20, 255, cv::THRESH_BINARY);
-        cv::imshow("threshold", output);
+//        cv::imshow("threshold", output);
 
         cv::blur(output, output, cv::Size(10, 10));
         cv::threshold(output, output, 20, 255, cv::THRESH_BINARY);
-        cv::imshow("final threshold", output);
+//        cv::imshow("final threshold", output);
 
 
         searchForMovement(output, colorFrame);
