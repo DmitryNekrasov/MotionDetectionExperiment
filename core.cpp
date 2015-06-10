@@ -23,9 +23,19 @@ void Core::start() {
     video >> frame;
     cv::imshow("Motion", frame);
 
+    cv::Mat frame2, output;
+
     while (true) {
         video >> frame;
+        cv::cvtColor(frame, frame, CV_BGR2GRAY);
         cv::imshow("Motion", frame);
+
+        video >> frame2;
+        cv::cvtColor(frame2, frame2, CV_BGR2GRAY);
+        cv::absdiff(frame, frame2, output);
+        cv::imshow("absdiff", output);
+
+
 
         // выходим из цикла, если нажата какая-нибудь клавиша
         int keyCode = cv::waitKey(10);
@@ -36,8 +46,8 @@ void Core::start() {
     // освобождаем память и уничтожаем окно
     video.release();
     frame.release();
+    cv::destroyWindow("absdiff");
     cv::destroyWindow("Motion");
-    cv::destroyWindow("Parvo");
     cv::destroyWindow("Magno");
     cv::destroyWindow("Magno High Binary Threshold");
     cv::destroyWindow("Magno Low Binary Threshold");
