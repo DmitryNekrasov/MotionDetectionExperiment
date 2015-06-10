@@ -19,23 +19,28 @@ void Core::start() {
     video.set(CV_CAP_PROP_FRAME_HEIGHT, windowHeight);
 
     cv::namedWindow("Motion", 0);
-    cv::Mat frame;
-    video >> frame;
-    cv::imshow("Motion", frame);
+    cv::Mat frame1;
+    video >> frame1;
+    cv::imshow("Motion", frame1);
 
     cv::Mat frame2, output;
 
     while (true) {
-        video >> frame;
-        cv::cvtColor(frame, frame, CV_BGR2GRAY);
-        cv::imshow("Motion", frame);
+        video >> frame1;
+        cv::cvtColor(frame1, frame1, CV_BGR2GRAY);
+        cv::imshow("Motion", frame1);
 
         video >> frame2;
         cv::cvtColor(frame2, frame2, CV_BGR2GRAY);
-        cv::absdiff(frame, frame2, output);
-
-        cv::threshold(output, output, 80, 255, cv::THRESH_BINARY);
+        cv::absdiff(frame1, frame2, output);
         cv::imshow("absdiff", output);
+
+        cv::threshold(output, output, 20, 255, cv::THRESH_BINARY);
+        cv::imshow("threshold", output);
+
+        cv::blur(output, output, cv::Size(10, 10));
+        cv::threshold(output, output, 20, 255, cv::THRESH_BINARY);
+        cv::imshow("final threshold", output);
 
 
 
@@ -47,11 +52,12 @@ void Core::start() {
 
     // освобождаем память и уничтожаем окно
     video.release();
-    frame.release();
+    frame1.release();
+    frame2.release();
     cv::destroyWindow("absdiff");
     cv::destroyWindow("Motion");
-    cv::destroyWindow("Magno");
-    cv::destroyWindow("Magno High Binary Threshold");
+    cv::destroyWindow("threshold");
+    cv::destroyWindow("final threshold");
     cv::destroyWindow("Magno Low Binary Threshold");
 }
 
