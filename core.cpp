@@ -33,6 +33,8 @@ void Core::start() {
         video >> frame2;
         cv::cvtColor(frame2, frame2, CV_BGR2GRAY);
         cv::absdiff(frame, frame2, output);
+
+        cv::threshold(output, output, 80, 255, cv::THRESH_BINARY);
         cv::imshow("absdiff", output);
 
 
